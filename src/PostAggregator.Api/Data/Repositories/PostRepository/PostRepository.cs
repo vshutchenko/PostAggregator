@@ -1,6 +1,7 @@
 ﻿using PostAggregator.Api.Data.Entities;
 using PostAggregator.Api.Data.Specification;
 using PostAggregator.Api.Exceptions;
+using PostAggregator.Api.Infrastructure;
 using System.Data.SQLite;
 
 namespace PostAggregator.Api.Data.Repositories.PostRepository;
@@ -11,10 +12,10 @@ public class PostRepository : IPostRepository
     private readonly ILogger<PostRepository> _logger;
     private readonly string _connectionString;
 
-    public PostRepository(ILogger<PostRepository> logger, string connectionString)
+    public PostRepository(ILogger<PostRepository> logger)
     {
         _logger = logger;
-        _connectionString = connectionString;
+        _connectionString = Environment.GetEnvironmentVariable(EnvironmentHelper.ConnectionString)!;
     }
 
     public async Task<Post> CreatePostAsync(Post post)
