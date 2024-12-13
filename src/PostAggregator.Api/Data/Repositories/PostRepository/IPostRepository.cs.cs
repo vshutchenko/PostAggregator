@@ -5,7 +5,7 @@ namespace PostAggregator.Api.Data.Repositories.PostRepository;
 
 public interface IPostRepository
 {
-    public Task<IEnumerable<PostEntity>> GetPostsAsync(ISpecification specification);
-    public Task<PostEntity> GetPostByIdAsync(Guid id);
-    public Task<PostEntity> CreatePostAsync(PostEntity post);
+    public Task<IEnumerable<Post>> GetPostsAsync(ISpecification specification);
+    public Task<Post> GetPostByIdAsync(Guid id);
+    public Task<Post> CreatePostAsync(Post post);
 }

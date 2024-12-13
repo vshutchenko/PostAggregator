@@ -2,8 +2,6 @@
 
 public class OrderBySpecification : ISpecification
 {
-    private const string ParameterName = "@columnName";
-
     public OrderBySpecification(string columnName, bool asc)
     {
         ColumnName = columnName;
@@ -15,13 +13,15 @@ public class OrderBySpecification : ISpecification
 
     public Dictionary<string, object> GetParameters()
     {
-        return new Dictionary<string, object>() { { ParameterName, ColumnName } };
+        // SQLite does not support passing column name using parameter syntax.
+        // Column name passed as a part of a query.
+        return new Dictionary<string, object>();
     }
 
     public string GetSqlQuery()
     {
-        var clause = $"{Environment.NewLine}ORDER BY {ParameterName}";
-        if (Asc)
+        var clause = $"{Environment.NewLine}ORDER BY {ColumnName}";
+        if (!Asc)
         {
             clause += " DESC";
         }

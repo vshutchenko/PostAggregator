@@ -50,7 +50,7 @@ public class DbInitializer
         command.Parameters.AddWithValue("@id1", Guid.NewGuid().ToString());
         command.Parameters.AddWithValue("@title1", "First Post Title");
         command.Parameters.AddWithValue("@author1", "Author1");
-        command.Parameters.AddWithValue("@createdAtUtc1", DateTime.UtcNow.ToString("o"));
+        command.Parameters.AddWithValue("@createdAtUtc1", DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss"));
         command.Parameters.AddWithValue("@link1", "http://example.com/first-post");
         command.Parameters.AddWithValue("@thumbnail1", "http://example.com/thumbnail1.jpg");
         command.Parameters.AddWithValue("@source1", "PostAggregator");
@@ -59,7 +59,7 @@ public class DbInitializer
         command.Parameters.AddWithValue("@id2", Guid.NewGuid().ToString());
         command.Parameters.AddWithValue("@title2", "Second Post Title");
         command.Parameters.AddWithValue("@author2", "Author2");
-        command.Parameters.AddWithValue("@createdAtUtc2", DateTime.UtcNow.ToString("o"));
+        command.Parameters.AddWithValue("@createdAtUtc2", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
         command.Parameters.AddWithValue("@link2", "http://example.com/second-post");
         command.Parameters.AddWithValue("@thumbnail2", "http://example.com/thumbnail2.jpg");
         command.Parameters.AddWithValue("@source2", "PostAggregator");
@@ -68,7 +68,7 @@ public class DbInitializer
         command.Parameters.AddWithValue("@id3", Guid.NewGuid().ToString());
         command.Parameters.AddWithValue("@title3", "Third Post Title");
         command.Parameters.AddWithValue("@author3", "Author3");
-        command.Parameters.AddWithValue("@createdAtUtc3", DateTime.UtcNow.ToString("o"));
+        command.Parameters.AddWithValue("@createdAtUtc3", DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd HH:mm:ss"));
         command.Parameters.AddWithValue("@link3", "http://example.com/third-post");
         command.Parameters.AddWithValue("@thumbnail3", "http://example.com/thumbnail3.jpg");
         command.Parameters.AddWithValue("@source3", "PostAggregator");

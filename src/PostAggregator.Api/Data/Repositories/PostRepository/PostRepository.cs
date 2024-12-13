@@ -7,7 +7,7 @@ namespace PostAggregator.Api.Data.Repositories.PostRepository;
 
 public class PostRepository : IPostRepository
 {
-
+    private const string DateFormat = "yyyy-MM-dd HH:mm:ss";
     private readonly ILogger<PostRepository> _logger;
     private readonly string _connectionString;
 
@@ -17,30 +17,30 @@ public class PostRepository : IPostRepository
         _connectionString = connectionString;
     }
 
-    public async Task<PostEntity> CreatePostAsync(PostEntity postEntity)
+    public async Task<Post> CreatePostAsync(Post post)
     {
         using var connection = new SQLiteConnection(_connectionString);
         string query = @"
-                    INSERT INTO Posts (Id, Title, Author, CreatedAtUtc, Link, Thumbnail, Source, Text) 
+                    INSERT INTO Post (Id, Title, Author, CreatedAtUtc, Link, Thumbnail, Source, Text) 
                     VALUES (@Id, @Title, @Author, @CreatedAtUtc, @Link, @Thumbnail, @Source, @Text);";
 
         using var command = new SQLiteCommand(query, connection);
-        command.Parameters.AddWithValue("@Id", postEntity.Id);
-        command.Parameters.AddWithValue("@Title", postEntity.Title);
-        command.Parameters.AddWithValue("@Author", postEntity.Author);
-        command.Parameters.AddWithValue("@CreatedAtUtc", postEntity.CreatedAtUtc);
-        command.Parameters.AddWithValue("@Link", postEntity.Link);
-        command.Parameters.AddWithValue("@Thumbnail", postEntity.Thumbnail);
-        command.Parameters.AddWithValue("@Source", postEntity.Source);
-        command.Parameters.AddWithValue("@Text", postEntity.Text ?? string.Empty);
+        command.Parameters.AddWithValue("@Id", post.Id.ToString().ToLower());
+        command.Parameters.AddWithValue("@Title", post.Title);
+        command.Parameters.AddWithValue("@Author", post.Author);
+        command.Parameters.AddWithValue("@CreatedAtUtc", post.CreatedAtUtc.ToString(DateFormat));
+        command.Parameters.AddWithValue("@Source", post.Source.ToString().ToLower());
+        command.Parameters.AddWithValue("@Text", post.Text);
+        command.Parameters.AddWithValue("@Link", post.Link);
+        command.Parameters.AddWithValue("@Thumbnail", post.Thumbnail);
 
         await connection.OpenAsync();
         await command.ExecuteNonQueryAsync();
 
-        return await GetPostByIdAsync(Guid.Parse(postEntity.Id));
+        return await GetPostByIdAsync(post.Id);
     }
 
-    public async Task<PostEntity> GetPostByIdAsync(Guid id)
+    public async Task<Post> GetPostByIdAsync(Guid id)
     {
         var query = "SELECT * FROM Post WHERE Id = @Id";
 
@@ -63,7 +63,7 @@ public class PostRepository : IPostRepository
         throw new NotFoundException("Post not found.");
     }
 
-    public async Task<IEnumerable<PostEntity>> GetPostsAsync(ISpecification specification)
+    public async Task<IEnumerable<Post>> GetPostsAsync(ISpecification specification)
     {
         var query = specification.GetSqlQuery();
         _logger.LogInformation("Executing sql query: {Query}", query);
@@ -75,8 +75,14 @@ public class PostRepository : IPostRepository
         {
             command.Parameters.AddWithValue(param.Key, param.Value);
         }
+        string qqq = command.CommandText;
 
-        var posts = new List<PostEntity>();
+        foreach (SQLiteParameter p in command.Parameters)
+        {
+            qqq = qqq.Replace(p.ParameterName, p.Value.ToString());
+        }
+        _logger.LogInformation("Executing sql query 2: {Query}", qqq);
+        var posts = new List<Post>();
 
         await connection.OpenAsync();
         using var reader = command.ExecuteReader();
@@ -92,19 +98,19 @@ public class PostRepository : IPostRepository
         return posts;
     }
 
-    private bool TryReadPost(SQLiteDataReader reader, out PostEntity post)
+    private bool TryReadPost(SQLiteDataReader reader, out Post post)
     {
         try
         {
-            post = new PostEntity
+            post = new Post
             {
-                Id = reader["Id"].ToString()!,
+                Id = Guid.Parse(reader["Id"].ToString()!),
                 Title = reader["Title"].ToString()!,
                 Author = reader["Author"].ToString()!,
-                CreatedAtUtc = reader["CreatedAtUtc"].ToString()!,
+                CreatedAtUtc = DateTime.Parse(reader["CreatedAtUtc"].ToString()!),
                 Link = reader["Link"].ToString()!,
                 Thumbnail = reader["Thumbnail"].ToString()!,
-                Source = reader["Source"].ToString()!,
+                Source = Enum.Parse<Source>(reader["Source"].ToString()!, true),
                 Text = reader["Text"].ToString()
             };
         }
