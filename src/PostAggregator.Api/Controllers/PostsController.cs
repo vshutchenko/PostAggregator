@@ -1,6 +1,7 @@
 using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using PostAggregator.Api.Dtos.Requests;
 using PostAggregator.Api.Dtos.Responses;
 using PostAggregator.Api.Services.PostService;
@@ -11,16 +12,19 @@ namespace PostAggregator.Api.Controllers
     [Route("posts")]
     public class PostsController : ControllerBase
     {
-        private IPostService _postService;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
+        private readonly IPostService _postService;
+        private readonly IOutputCacheStore _cacheStore;
 
-        public PostsController(IPostService postService, IMapper mapper)
+        public PostsController(IPostService postService, IMapper mapper, IOutputCacheStore cacheStore)
         {
-            _postService = postService;
             _mapper = mapper;
+            _postService = postService;
+            _cacheStore = cacheStore;
         }
 
         [HttpGet]
+        [OutputCache(Tags = ["posts"])]
         public async Task<IActionResult> GetPostsAsync(
             [FromQuery] PageRequest request,
             [FromServices] IValidator<PageRequest> validator)
@@ -34,6 +38,7 @@ namespace PostAggregator.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [OutputCache(Tags = ["posts", "{id}"])]
         public async Task<IActionResult> GetPostById(Guid id)
         {
             var post = await _postService.GetPostByIdAsync(id);
@@ -51,6 +56,8 @@ namespace PostAggregator.Api.Controllers
 
             var createdPost = await _postService.CreatePost(request);
             var postDto = _mapper.Map<PostDto>(createdPost);
+
+            await _cacheStore.EvictByTagAsync("posts", CancellationToken.None);
 
             return CreatedAtAction(nameof(GetPostById), new { id = postDto.Id }, postDto);
         }

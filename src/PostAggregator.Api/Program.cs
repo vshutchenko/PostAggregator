@@ -26,6 +26,12 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreatePostRequestValidator>
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+builder.Services.AddOutputCache(options =>
+{
+    options.AddPolicy("PostsPolicy", policy =>
+        policy.Expire(TimeSpan.FromSeconds(60)).Tag("posts"));
+});
+
 var app = builder.Build();
 
 var db = new DbInitializer();
@@ -39,6 +45,8 @@ if (app.Environment.IsDevelopment())
 }
 
 EnvironmentVariableHelper.EnsureRequiredVariablesSet();
+
+app.UseOutputCache();
 
 app.UseExceptionHandler();
 
