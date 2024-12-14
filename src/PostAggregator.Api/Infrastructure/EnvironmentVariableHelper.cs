@@ -1,6 +1,6 @@
 ﻿namespace PostAggregator.Api.Infrastructure;
 
-public static class EnvironmentHelper
+public static class EnvironmentVariableHelper
 {
     public const string RedditUsername = "REDDIT_USERNAME";
     public const string RedditPassword = "REDDIT_PASSWORD";
@@ -30,5 +30,12 @@ public static class EnvironmentHelper
                 $"One or more required environment variables are missing(" +
                 $"{string.Join(", ", notSetVariables)}). Application cannot start.");
         }
+    }
+
+    public static string GetVariable(string variableName)
+    {
+        return Environment.GetEnvironmentVariable(variableName) ??
+            throw new InvalidOperationException(
+                $"Environment variable is missing({variableName}).");
     }
 }

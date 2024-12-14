@@ -15,7 +15,7 @@ public class PostRepository : IPostRepository
     public PostRepository(ILogger<PostRepository> logger)
     {
         _logger = logger;
-        _connectionString = Environment.GetEnvironmentVariable(EnvironmentHelper.ConnectionString)!;
+        _connectionString = EnvironmentVariableHelper.GetVariable(EnvironmentVariableHelper.ConnectionString);
     }
 
     public async Task<Post> CreatePostAsync(Post post)
@@ -97,6 +97,19 @@ public class PostRepository : IPostRepository
         }
 
         return posts;
+    }
+
+    public async Task<int> GetPostsCountAsync()
+    {
+        string query = "SELECT COUNT(*) FROM Post;";
+
+        using var connection = new SQLiteConnection(_connectionString);
+        await connection.OpenAsync();
+
+        using var command = new SQLiteCommand(query, connection);
+        var result = await command.ExecuteScalarAsync();
+
+        return Convert.ToInt32(result);
     }
 
     private bool TryReadPost(SQLiteDataReader reader, out Post post)

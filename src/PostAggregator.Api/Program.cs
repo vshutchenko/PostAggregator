@@ -5,6 +5,7 @@ using PostAggregator.Api.Services.PostService;
 using Serilog;
 using FluentValidation;
 using PostAggregator.Api.Validators;
+using PostAggregator.Api.Services.Reddit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IRedditService, RedditService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -32,12 +34,11 @@ db.Initialize();
 if (app.Environment.IsDevelopment())
 {
     DotNetEnv.Env.Load();
-    db.AddDemoData();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-EnvironmentHelper.EnsureRequiredVariablesSet();
+EnvironmentVariableHelper.EnsureRequiredVariablesSet();
 
 app.UseExceptionHandler();
 
