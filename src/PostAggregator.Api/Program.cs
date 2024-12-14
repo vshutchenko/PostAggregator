@@ -6,6 +6,7 @@ using Serilog;
 using FluentValidation;
 using PostAggregator.Api.Validators;
 using PostAggregator.Api.Services.Reddit;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,11 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IRedditService, RedditService>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreatePostRequestValidator>();
 
