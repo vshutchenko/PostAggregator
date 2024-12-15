@@ -76,13 +76,7 @@ public class PostRepository : IPostRepository
         {
             command.Parameters.AddWithValue(param.Key, param.Value);
         }
-        string qqq = command.CommandText;
 
-        foreach (SQLiteParameter p in command.Parameters)
-        {
-            qqq = qqq.Replace(p.ParameterName, p.Value.ToString());
-        }
-        _logger.LogInformation("Executing sql query 2: {Query}", qqq);
         var posts = new List<Post>();
 
         await connection.OpenAsync();
