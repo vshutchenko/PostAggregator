@@ -9,29 +9,41 @@ namespace PostAggregator.Api.Services.Reddit;
 
 public class RedditService : IRedditService
 {
-    private const string UserAgent = "PostAggregator";
-    private readonly string RedditUsername = EnvironmentVariableHelper.GetVariable(EnvironmentVariableHelper.RedditUsername);
-    private readonly string RedditPassword = EnvironmentVariableHelper.GetVariable(EnvironmentVariableHelper.RedditPassword);
-    private readonly string RedditClientId = EnvironmentVariableHelper.GetVariable(EnvironmentVariableHelper.RedditClientId);
-    private readonly string RedditClientSecret = EnvironmentVariableHelper.GetVariable(EnvironmentVariableHelper.RedditClientSecret);
+    private readonly string RedditUsername;
+    private readonly string RedditPassword;
+    private readonly string RedditClientId;
+    private readonly string RedditClientSecret;
 
     private ILogger<RedditService> _logger;
     private IMapper _mapper;
     private IHttpClientFactory _clientFactory;
 
-    public RedditService(ILogger<RedditService> logger, IMapper mapper, IHttpClientFactory clientFactory)
+    public RedditService(
+        IMapper mapper,
+        ILogger<RedditService> logger,     
+        IHttpClientFactory clientFactory,
+        BaseEnvironmentHelper environmentHelper)
     {
         _logger = logger;
         _mapper = mapper;
         _clientFactory = clientFactory;
+
+        RedditUsername = environmentHelper.GetRequiredVariable(BaseEnvironmentHelper.RedditUsername);
+        RedditPassword = environmentHelper.GetRequiredVariable(BaseEnvironmentHelper.RedditPassword);
+        RedditClientId = environmentHelper.GetRequiredVariable(BaseEnvironmentHelper.RedditClientId);
+        RedditClientSecret = environmentHelper.GetRequiredVariable(BaseEnvironmentHelper.RedditClientSecret);
     }
 
     public async Task<IEnumerable<Post>> GetPostsAsync()
     {
+        using var client = _clientFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("User-Agent", "PostAggregator");
+        client.BaseAddress = new Uri("https://www.reddit.com/");
+
         try
         {
-            string? accessToken = await GetAccessToken();
-            var posts = await GetRedditPosts(accessToken!);
+            string? accessToken = await GetAccessToken(client);
+            var posts = await GetRedditPosts(client, accessToken!);
             _logger.LogInformation("Fetched {count} posts from reddit.", posts.Count());
             return posts;
         }
@@ -42,14 +54,11 @@ public class RedditService : IRedditService
         }
     }
 
-    private async Task<string?> GetAccessToken()
+    private async Task<string?> GetAccessToken(HttpClient client)
     {
-        using var client = _clientFactory.CreateClient();
-
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Basic", Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{RedditClientId}:{RedditClientSecret}"))
         );
-        client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
 
         var content = new FormUrlEncodedContent([
             new KeyValuePair<string, string>("grant_type", "password"),
@@ -57,7 +66,7 @@ public class RedditService : IRedditService
             new KeyValuePair<string, string>("password", RedditPassword)
         ]);
 
-        var response = await client.PostAsync("https://www.reddit.com/api/v1/access_token", content);
+        var response = await client.PostAsync("/api/v1/access_token", content);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -72,14 +81,11 @@ public class RedditService : IRedditService
         return accessTokenResponse?.AccessToken;
     }
 
-    private async Task<IEnumerable<Post>> GetRedditPosts(string accessToken, int limit = 50)
+    private async Task<IEnumerable<Post>> GetRedditPosts(HttpClient client, string accessToken, int limit = 50)
     {
-        using var client = _clientFactory.CreateClient();
-
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
 
-        var response = await client.GetAsync($"https://www.reddit.com/r/funny/top.json?limit={limit}");
+        var response = await client.GetAsync($"/r/funny/top.json?limit={limit}");
         response.EnsureSuccessStatusCode();
 
         var responseBody = await response.Content.ReadAsStringAsync();

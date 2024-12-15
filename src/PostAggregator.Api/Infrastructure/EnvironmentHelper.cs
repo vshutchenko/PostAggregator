@@ -1,17 +1,8 @@
 ﻿namespace PostAggregator.Api.Infrastructure;
 
-public static class EnvironmentVariableHelper
+public class EnvironmentHelper : BaseEnvironmentHelper
 {
-    public const string RedditUsername = "REDDIT_USERNAME";
-    public const string RedditPassword = "REDDIT_PASSWORD";
-    public const string RedditClientId = "REDDIT_CLIENT_ID";
-    public const string RedditClientSecret = "REDDIT_CLIENT_SECRET";
-
-    public const string ConnectionString = "CONNECTION_STRING";
-
-    public readonly static string[] RequiredVariables = [RedditClientId, RedditClientSecret, RedditPassword, RedditUsername, ConnectionString];
-
-    public static void EnsureRequiredVariablesSet()
+    public override void EnsureRequiredVariablesSet()
     {
         var notSetVariables = new List<string>();
 
@@ -32,7 +23,7 @@ public static class EnvironmentVariableHelper
         }
     }
 
-    public static string GetVariable(string variableName)
+    public override string GetRequiredVariable(string variableName)
     {
         return Environment.GetEnvironmentVariable(variableName) ??
             throw new InvalidOperationException(

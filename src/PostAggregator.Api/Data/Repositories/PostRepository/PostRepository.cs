@@ -12,10 +12,10 @@ public class PostRepository : IPostRepository
     private readonly ILogger<PostRepository> _logger;
     private readonly string _connectionString;
 
-    public PostRepository(ILogger<PostRepository> logger)
+    public PostRepository(ILogger<PostRepository> logger, BaseEnvironmentHelper environmentHelper)
     {
         _logger = logger;
-        _connectionString = EnvironmentVariableHelper.GetVariable(EnvironmentVariableHelper.ConnectionString);
+        _connectionString = environmentHelper.GetRequiredVariable(BaseEnvironmentHelper.ConnectionString);
     }
 
     public async Task<Post> CreatePostAsync(Post post)

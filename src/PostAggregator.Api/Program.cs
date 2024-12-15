@@ -15,6 +15,7 @@ builder.Host.UseSerilog((context, configuration) =>
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddScoped<BaseEnvironmentHelper, EnvironmentHelper>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IRedditService, RedditService>();
@@ -41,17 +42,20 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-var db = new DbInitializer();
-db.Initialize();
-
 if (app.Environment.IsDevelopment())
 {
+    var db = new DbInitializer();
+    db.Initialize();
     DotNetEnv.Env.Load();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-EnvironmentVariableHelper.EnsureRequiredVariablesSet();
+using (var scope = app.Services.CreateScope())
+{
+    var environmentHelper = scope.ServiceProvider.GetRequiredService<BaseEnvironmentHelper>();
+    environmentHelper.EnsureRequiredVariablesSet();
+}
 
 app.UseOutputCache();
 
