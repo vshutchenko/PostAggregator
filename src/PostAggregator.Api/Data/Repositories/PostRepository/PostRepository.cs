@@ -116,8 +116,8 @@ public class PostRepository : IPostRepository
                 Title = reader["Title"].ToString()!,
                 Author = reader["Author"].ToString()!,
                 CreatedAtUtc = DateTime.Parse(reader["CreatedAtUtc"].ToString()!),
-                Link = reader["Link"].ToString()!,
-                Thumbnail = reader["Thumbnail"].ToString()!,
+                Link = reader["Link"].ToString(),
+                Thumbnail = reader["Thumbnail"].ToString(),
                 Source = Enum.Parse<Source>(reader["Source"].ToString()!, true),
                 Text = reader["Text"].ToString()
             };

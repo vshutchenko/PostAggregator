@@ -17,11 +17,13 @@ public class RedditService : IRedditService
 
     private ILogger<RedditService> _logger;
     private IMapper _mapper;
+    private IHttpClientFactory _clientFactory;
 
-    public RedditService(ILogger<RedditService> logger, IMapper mapper)
+    public RedditService(ILogger<RedditService> logger, IMapper mapper, IHttpClientFactory clientFactory)
     {
         _logger = logger;
         _mapper = mapper;
+        _clientFactory = clientFactory;
     }
 
     public async Task<IEnumerable<Post>> GetPostsAsync()
@@ -42,7 +44,8 @@ public class RedditService : IRedditService
 
     private async Task<string?> GetAccessToken()
     {
-        using var client = new HttpClient();
+        using var client = _clientFactory.CreateClient();
+
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Basic", Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{RedditClientId}:{RedditClientSecret}"))
         );
@@ -71,7 +74,8 @@ public class RedditService : IRedditService
 
     private async Task<IEnumerable<Post>> GetRedditPosts(string accessToken, int limit = 50)
     {
-        using var client = new HttpClient();
+        using var client = _clientFactory.CreateClient();
+
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         client.DefaultRequestHeaders.Add("User-Agent", UserAgent);
 

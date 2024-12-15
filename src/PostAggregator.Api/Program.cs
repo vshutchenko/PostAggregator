@@ -37,6 +37,8 @@ builder.Services.AddOutputCache(options =>
         policy.Expire(TimeSpan.FromSeconds(60)).Tag("posts"));
 });
 
+builder.Services.AddHttpClient();
+
 var app = builder.Build();
 
 var db = new DbInitializer();
