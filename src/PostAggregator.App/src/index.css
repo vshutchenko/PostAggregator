@@ -1,0 +1,33 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Inter", sans-serif; /* Adding a clean font */
+  background-color: #f7f7f7; /* Set a light background color */
+}
+
+h1,
+h2 {
+  font-family: "Roboto", sans-serif; /* Adding a more structured font for headers */
+}
+
+/* Add this to your CSS file (e.g., App.css or index.css) */
+.loader {
+  border: 8px solid #f3f3f3; /* Light grey */
+  border-top: 8px solid theme("colors.blue.700"); /* Blue */
+  border-radius: 50%;
+  width: 50px; /* Size of the spinner */
+  height: 50px; /* Size of the spinner */
+  animation: spin 1s linear infinite; /* Animation */
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
