@@ -40,11 +40,23 @@ builder.Services.AddOutputCache(options =>
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
 {
-    var db = new DbInitializer();
+    var db = new DbInitializer("posts.db", "Data Source=posts.db;");
     db.Initialize();
     DotNetEnv.Env.Load();
     app.UseSwagger();

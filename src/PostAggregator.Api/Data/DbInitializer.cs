@@ -4,8 +4,14 @@ namespace PostAggregator.Api.Data;
 
 public class DbInitializer
 {
-    private const string DbFileName = "posts.db";
-    private const string ConnectionString = "Data Source=posts.db;Version=3;";
+    private string DbFileName;
+    private string ConnectionString;
+
+    public DbInitializer(string dbFileName, string connectionString)
+    {
+        DbFileName = dbFileName;
+        ConnectionString = connectionString;
+    }
 
     public void Initialize()
     {
