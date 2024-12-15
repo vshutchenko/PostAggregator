@@ -6,19 +6,17 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    "baseUrl": ".", // This is necessary to enable relative paths from the root
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"] // Alias '@' to the 'src' folder
+      "@/*": ["src/*"]
     },
 
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
 
-    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import tailwindcss from "tailwindcss";
 import path from "path";
 
-// https://vite.dev/config/
 export default defineConfig({
   resolve: {
     alias: {
@@ -17,8 +16,6 @@ export default defineConfig({
     },
   },
   server: {
-    proxy: {
-      "/api": "http://localhost:5000", // Proxy to your server's backend
-    },
+    port: 10000,
   },
 });

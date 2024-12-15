@@ -12,7 +12,7 @@ namespace PostAggregator.Api.Controllers
     /// Controller for managing posts.
     /// </summary>
     [ApiController]
-    [Route("posts")]
+    [Route("api/posts")]
     public class PostsController : ControllerBase
     {
         private readonly IMapper _mapper;
