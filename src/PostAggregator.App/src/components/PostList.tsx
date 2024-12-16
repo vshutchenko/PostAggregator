@@ -4,6 +4,7 @@ import { fetchPosts } from "@/services/postService";
 import Post from "@/components/Post";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Message from "@/components/Message";
+import { toast } from "react-hot-toast";
 
 const PostList: React.FC = () => {
   const [posts, setPosts] = useState<PostType[]>([]);
@@ -15,7 +16,12 @@ const PostList: React.FC = () => {
     setLoading(true);
     try {
       const postsData = await fetchPosts(page);
-      setPosts((prevPosts) => [...prevPosts, ...postsData]);
+
+      if (postsData.length === 0) {
+        toast.success("All posts have been loaded!");
+      } else {
+        setPosts((prevPosts) => [...prevPosts, ...postsData]);
+      }
     } catch (err) {
       console.error(err);
       setError("Failed to fetch posts");

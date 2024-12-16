@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using PostAggregator.Api.Dtos.Requests;
+using System.Buffers.Text;
 using System.Text.RegularExpressions;
 
 namespace PostAggregator.Api.Validators;
@@ -20,9 +21,18 @@ public class CreatePostRequestValidator : AbstractValidator<CreatePostRequest>
     {
         if (value == null) return true;
 
-        var base64ImageRegex = new Regex(@"^data:image\/jpeg;base64,[A-Za-z0-9\+\/=]+$");
+        var base64Pattern = @"^data:image\/(?:jpeg|png|gif|bmp|webp);base64,";
 
-        return base64ImageRegex.IsMatch(value);
+        var match = Regex.Match(value, base64Pattern);
+
+        if (match.Success)
+        {
+            var base64Data = value.Substring(match.Length);
+            Span<byte> buffer = new Span<byte>(new byte[base64Data.Length]);
+            return Convert.TryFromBase64String(base64Data, buffer, out _);
+        }
+
+        return false;
     }
-
 }
+

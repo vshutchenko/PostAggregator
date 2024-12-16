@@ -3,7 +3,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { createPost } from "@/services/postService";
 import { CreatePost } from "@/types/api/CreatePost";
-import Message from "@/components/Message";
+import { toast } from "react-hot-toast";
 
 const CreatePostForm: React.FC = () => {
   const [formData, setFormData] = useState<CreatePost>({
@@ -13,8 +13,6 @@ const CreatePostForm: React.FC = () => {
     thumbnail: undefined,
   });
 
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleChange = (
@@ -34,11 +32,18 @@ const CreatePostForm: React.FC = () => {
     }));
   };
 
-  const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+
     if (file) {
+      const maxSizeInBytes = 512 * 1024;
+
+      toast.dismiss();
+      if (file.size > maxSizeInBytes) {
+        toast.error("File size exceeds the 512KB limit. Please upload a smaller image.");
+        return;
+      }
+
       const base64 = await convertToBase64(file);
       setFormData((prevData) => ({
         ...prevData,
@@ -50,11 +55,9 @@ const CreatePostForm: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsSubmitting(true);
-    setError(null);
-    setSuccess(null);
 
     if (!formData.text.trim()) {
-      setError("Text is required.");
+      toast.error("Text is required.");
       setIsSubmitting(false);
       return;
     }
@@ -63,7 +66,7 @@ const CreatePostForm: React.FC = () => {
 
     try {
       await createPost(postData);
-      setSuccess("Post created successfully!");
+      toast.success("Post created successfully!");
 
       setFormData({
         title: "",
@@ -72,7 +75,7 @@ const CreatePostForm: React.FC = () => {
         thumbnail: undefined,
       });
     } catch (error) {
-      setError("Error creating post. Please try again.");
+      toast.error("Error creating post. Please try again.");
       console.error("Error creating post:", error);
     } finally {
       setIsSubmitting(false);
@@ -90,9 +93,6 @@ const CreatePostForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {success && <Message type="success" message={success} />}
-      {error && <Message type="error" message={error} />}
-
       <div>
         <label
           htmlFor="image"
