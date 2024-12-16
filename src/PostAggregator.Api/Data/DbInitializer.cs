@@ -4,25 +4,25 @@ namespace PostAggregator.Api.Data;
 
 public class DbInitializer
 {
-    private string DbFileName;
-    private string ConnectionString;
+    private string _dbFileName;
+    private string _connectionString;
 
-    public DbInitializer(string dbFileName, string connectionString)
+    public DbInitializer(string connectionString)
     {
-        DbFileName = dbFileName;
-        ConnectionString = connectionString;
+        _connectionString = connectionString;
+        _dbFileName = new SQLiteConnectionStringBuilder(connectionString).DataSource;     
     }
 
     public void Initialize()
     {
-        if (File.Exists(DbFileName))
+        if (File.Exists(_dbFileName))
         {
             return;
         }
 
-        SQLiteConnection.CreateFile(DbFileName);
+        SQLiteConnection.CreateFile(_dbFileName);
 
-        using var connection = new SQLiteConnection(ConnectionString);
+        using var connection = new SQLiteConnection(_connectionString);
         connection.Open();
 
         string createTableQuery = @"
@@ -50,7 +50,7 @@ public class DbInitializer
 
             (@id3, @title3, @author3, @createdAtUtc3, @link3, @thumbnail3, @source3, @text3);";
 
-        using var connection = new SQLiteConnection(ConnectionString);
+        using var connection = new SQLiteConnection(_connectionString);
         using var command = new SQLiteCommand(insertDemoDataQuery, connection);
 
         command.Parameters.AddWithValue("@id1", Guid.NewGuid().ToString());
