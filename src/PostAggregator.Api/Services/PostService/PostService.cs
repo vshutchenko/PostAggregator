@@ -25,6 +25,7 @@ public class PostService : IPostService
             Title = createPostRequest.Title,
             Text = createPostRequest.Text,
             Author = createPostRequest.Author,
+            Thumbnail = createPostRequest.Thumbnail,
             CreatedAtUtc = DateTime.UtcNow,
             Source = Source.PostAggregator,
         };

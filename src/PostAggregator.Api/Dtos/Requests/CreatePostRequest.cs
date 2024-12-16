@@ -19,4 +19,9 @@ public class CreatePostRequest
     /// The main text content of the post.
     /// </summary>
     public string Text { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The thumbnail of the post in base64 format.
+    /// </summary>
+    public string? Thumbnail { get; set; }
 }

@@ -10,4 +10,6 @@ public class RedditPostData
     public string Thumbnail { get; set; } = string.Empty;
     [JsonProperty("created_utc")]
     public long CreatedUtc { get; set; }
+    [JsonProperty("selftext")]
+    public string? Text { get; set; }
 }
