@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostAggregator.Api", "src\PostAggregator.Api\PostAggregator.Api.csproj", "{57A8162F-2E34-493F-9792-941126845B5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostAggregator.Test", "PostAggregator.Test\PostAggregator.Test.csproj", "{5AFCC900-23E4-48FD-87B5-1F7AE3A36BC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostAggregator.Test", "test\PostAggregator.Test\PostAggregator.Test.csproj", "{5AFCC900-23E4-48FD-87B5-1F7AE3A36BC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
