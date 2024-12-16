@@ -34,6 +34,32 @@ public class OrderBySpecificationTests
     }
 
     [Test]
+    public void GetSqlQuery_ShouldReturnCorrectSql_WhenColumnIsCreatedAtUtc_AndAscIsTrue()
+    {
+        // Arrange
+        var spec = new OrderBySpecification("createdatutc", true);
+
+        // Act
+        var result = spec.GetSqlQuery();
+
+        // Assert
+        result.Should().BeEquivalentTo($"{Environment.NewLine}ORDER BY datetime(createdatutc)");
+    }
+
+    [Test]
+    public void GetSqlQuery_ShouldReturnCorrectSql_WhenColumnIsCreatedAtUtc_AndAscIsFalse()
+    {
+        // Arrange
+        var spec = new OrderBySpecification("createdatutc", false);
+
+        // Act
+        var result = spec.GetSqlQuery();
+
+        // Assert
+        result.Should().BeEquivalentTo($"{Environment.NewLine}ORDER BY datetime(createdatutc) DESC");
+    }
+
+    [Test]
     public void GetParameters_ShouldReturnEmptyDictionary()
     {
         // Arrange

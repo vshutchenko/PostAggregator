@@ -1,4 +1,6 @@
-﻿namespace PostAggregator.Api.Data.Specification;
+﻿using System;
+
+namespace PostAggregator.Api.Data.Specification;
 
 public class OrderBySpecification : ISpecification
 {
@@ -20,7 +22,17 @@ public class OrderBySpecification : ISpecification
 
     public string GetSqlQuery()
     {
-        var clause = $"{Environment.NewLine}ORDER BY {ColumnName}";
+        var clause = string.Empty;
+
+        if (ColumnName.Equals("createdatutc", StringComparison.OrdinalIgnoreCase))
+        {
+            clause = $"{Environment.NewLine}ORDER BY datetime({ColumnName})";
+        }
+        else
+        {
+            clause = $"{Environment.NewLine}ORDER BY {ColumnName}";
+        }
+
         if (!Asc)
         {
             clause += " DESC";

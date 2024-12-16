@@ -18,7 +18,7 @@ public class PageRequest
     /// <summary>
     /// The column by which to order the results. Valid values are the property names of the post (case-insensitive).
     /// </summary>
-    public string OrderColumn { get; set; } = "author";
+    public string OrderColumn { get; set; } = "createdatutc";
 
     /// <summary>
     /// Indicates whether the sorting should be in ascending order.
