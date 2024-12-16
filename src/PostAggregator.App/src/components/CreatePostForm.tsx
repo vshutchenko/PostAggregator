@@ -53,6 +53,12 @@ const CreatePostForm: React.FC = () => {
     setError(null);
     setSuccess(null);
 
+    if (!formData.text.trim()) {
+      setError("Text is required.");
+      setIsSubmitting(false);
+      return;
+    }
+
     const postData = { ...formData };
 
     try {
